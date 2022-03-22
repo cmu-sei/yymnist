@@ -18,6 +18,52 @@ import shutil
 import random
 import argparse
 
+'''
+#================================================================
+Begin Functions by Benjamin Commeau
+#================================================================
+'''
+
+'''
+Edited on March 17, 2022
+
+The functions random_numpy(*args) and random_python(random_type,*args)
+act as handlers for calling the local generators _rng_numpy and 
+_rng_python with user specified random seeds seed_numpy and seed_python.
+
+All code that has been replaced by random_numpy and randon_python are 
+commented with "Benjamin Commeau's edit"
+
+I discovered from reading other documents online that calling the global random functions, such as np.random.seed(seed_numpy), can potentially use the same seed for other modules calling the global random functions. So, I implemented local generators instead, to prevent this module effect other module
+calls.
+
+Even though the local random generators are called as global variables 
+inside their respective functions, these local random generators do not
+effect the global or other local generators in other modules.
+'''
+
+seed_numpy = 2**15-1
+_rng_numpy = np.random.default_rng(seed_numpy)
+def random_numpy(*args):
+    global _rng_numpy
+    return _rng_numpy.integers(*args)
+
+seed_python = 2**15-1
+_rng_python = random.Random(seed_python)
+def random_python(random_type, *args):
+    global _rng_python
+    if random_type == 'choice':
+        return _rng_python.choice(*args)
+    elif random_type == 'randint':
+        return _rng_python.randint(*args)
+    else:
+        return None
+'''
+#================================================================
+End Functions by Benjamin Commeau
+#================================================================
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--images_num", type=int, default=1000)
 parser.add_argument("--image_size", type=int, default=416)
@@ -63,8 +109,14 @@ def make_image(data, image_path, ratio=1):
     h, w, c = image.shape
 
     while True:
+        '''
+        # Benjamin Commeau's edit:
         xmin = np.random.randint(0, SIZE-w, 1)[0]
         ymin = np.random.randint(0, SIZE-h, 1)[0]
+        '''
+        xmin = random_numpy(0, SIZE-w, 1)[0]
+        ymin = random_numpy(0, SIZE-h, 1)[0]
+
         xmax = xmin + w
         ymax = ymin + h
         box = [xmin, ymin, xmax, ymax]
@@ -97,29 +149,58 @@ with open(flags.labels_txt, "w") as wf:
 
         # small object
         ratios = [0.5, 0.8]
+        '''
+        # Benjamin Commeau's edit:
         N = random.randint(0, flags.small)
+        '''
+        N = random_python('randint', 0, flags.small)
+
         if N !=0: bboxes_num += 1
         for _ in range(N):
+            '''
+            # Benjamin Commeau's edit:
             ratio = random.choice(ratios)
             idx = random.randint(0, 54999)
+            '''
+            ratio = random_python('choice', ratios)
+            idx = random_python('randint', 0, 54999)
+
             data[0] = make_image(data, image_paths[idx], ratio)
 
         # medium object
         ratios = [1., 1.5, 2.]
+        '''
+        # Benjamin Commeau's edit:
         N = random.randint(0, flags.medium)
+        '''
+        N = random_python('randint', 0, flags.medium)
         if N !=0: bboxes_num += 1
         for _ in range(N):
+            '''
+            # Benjamin Commeau's edit:
             ratio = random.choice(ratios)
             idx = random.randint(0, 54999)
+            '''
+            ratio = random_python('choice', ratios)
+            idx = random_python('randint', 0, 54999)
             data[0] = make_image(data, image_paths[idx], ratio)
 
         # big object
         ratios = [3., 4.]
+        '''
+        # Benjamin Commeau's edit:
         N = random.randint(0, flags.big)
+        '''
+        N = random_python('randint', 0, flags.big)
         if N !=0: bboxes_num += 1
         for _ in range(N):
+            '''
+            # Benjamin Commeau's edit:
             ratio = random.choice(ratios)
             idx = random.randint(0, 54999)
+            '''
+            ratio = random_python('choice', ratios)
+            idx = random_python('randint', 0, 54999)
             data[0] = make_image(data, image_paths[idx], ratio)
 
         if bboxes_num == 0: continue
