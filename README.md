@@ -29,12 +29,17 @@ mnist/train/5_12156.pgm -> 5
 $ python yymnist/make_data.py
 $ python yymnist/show_image.py # [option]
 ```
-you will defaultly get 1000 pictures in the folder `./yymnist/Images` and a `label.txt` in the `./yymnist/`. As for `label.txt`
+you will get 1000 pictures in the folder `./yymnist/Images` and a `label.txt` in the `./yymnist/`. As for `label.txt`
 
 ```
 # image_path x_min, y_min, x_max, y_max, class_id  x_min, y_min ,..., class_id 
 ```
 
+To get a reproducible data set (so others can generate the same data using the same code version) specify the `--seed` 
+switch with an integer seed that is in the range of an unsigned in. This, in the range 0 to 2**32-1.  For example:
 
+```
+$ python yymnist/make_data.py --seed 1234
+```
 
 
